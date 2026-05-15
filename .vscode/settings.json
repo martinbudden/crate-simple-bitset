@@ -1,0 +1,22 @@
+{
+    "cSpell.words": [
+        "astextplain",
+        "autocfg",
+        "bitsets",
+        "Budden",
+        "bytemuck",
+        "byteorder",
+        "codegen",
+        "debuginfo",
+        "heapless",
+        "inplace",
+        "katex",
+        "libm",
+        "rustc",
+        "rustdoc",
+        "sbuf",
+        "scopeguard",
+        "serde",
+        "thiserror"
+    ]
+}
