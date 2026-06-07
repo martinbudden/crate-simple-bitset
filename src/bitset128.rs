@@ -1,9 +1,14 @@
 use core::fmt;
 use core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index};
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "serde")]
+use {
+    sequential_storage::map::PostcardValue,
+    serde::{Deserialize, Serialize},
+};
 
 /// A memory-efficient 128-bit set for embedded environments.
-#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct BitSet128(u64, u64);
 
 impl BitSet128 {
@@ -12,6 +17,9 @@ impl BitSet128 {
         Self(0, 0)
     }
 }
+
+#[cfg(feature = "serde")]
+impl PostcardValue<'_> for BitSet128 {}
 
 impl Default for BitSet128 {
     fn default() -> Self {
@@ -375,14 +383,14 @@ mod tests {
     use super::*;
 
     fn is_normal<T: Sized + Send + Sync + Unpin>() {}
-    fn _is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
-    fn is_config<
-        T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq + Serialize + for<'a> Deserialize<'a>,
-    >() {
-    }
+    fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
+    #[cfg(feature = "serde")]
+    fn is_config<T: Serialize + for<'a> Deserialize<'a>>() {}
 
     #[test]
     fn normal_types() {
+        is_full::<BitSet128>();
+        #[cfg(feature = "serde")]
         is_config::<BitSet128>();
         is_normal::<BitSet128Iter>();
     }

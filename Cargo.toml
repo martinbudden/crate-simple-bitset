@@ -15,11 +15,19 @@ categories = [
 ]
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--html-in-header", "katex-header.html"]
+all-features = true
+
+[build-dependencies]
+rustc_version = "0.4.1"
+
+[features]
+default = []
+serde = ["dep:serde", "postcard", "sequential-storage"]
 
 [dependencies]
-serde = "1.0.228"
-postcard = { version = "1.1.3", features = ["embedded-io"] }
+serde = { version = "1.0.228", default-features = false, features = ["derive"], optional = true }
+postcard = { version = "1.1.3", default-features = false, features = ["embedded-io"], optional = true }
+sequential-storage = { version = "7.2.0", features = ["postcard"], optional = true }
 
 # see https://doc.rust-lang.org/cargo/reference/profiles.html
 [profile.dev]

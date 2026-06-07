@@ -23,6 +23,19 @@ Once the API has stabilized this project will adopt semantic versioning, the fir
 
 ### Security
 
+## [0.1.1] - 2023-06-07
+
+### Added
+
+### Changed
+
+- Improved `serde` support.
+- Included full text of Apache 2.0 license
+
+### Removed
+
+- `katex-header.html`.
+
 ## [0.1.0] - 2023-05-15
 
 Initial release.
