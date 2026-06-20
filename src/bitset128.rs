@@ -13,6 +13,7 @@ pub struct BitSet128(u64, u64);
 
 impl BitSet128 {
     /// Create a new empty bitset.
+    #[must_use]
     pub const fn new() -> Self {
         Self(0, 0)
     }
@@ -90,6 +91,7 @@ impl BitSet128 {
     /// Tests if the bit at `index` is 1.
     /// Returns false if the bit is 0 or index is out of bounds.
     #[inline]
+    #[must_use]
     pub fn test(&self, index: u8) -> bool {
         if index < 64 {
             (self.0 & (1u64 << index)) != 0
@@ -102,6 +104,7 @@ impl BitSet128 {
 
     /// Returns the number of set bits (population count).
     #[inline]
+    #[must_use]
     pub const fn count_ones(&self) -> u32 {
         self.0.count_ones() + self.1.count_ones()
     }
@@ -109,6 +112,7 @@ impl BitSet128 {
     /// Returns the number of leading zeros in the bitset,
     /// counting from the most significant bit (index 127).
     #[inline]
+    #[must_use]
     pub const fn leading_zeros(&self) -> u32 {
         // If the higher 64 bits are completely empty, then all those 64 bits
         // are zeros. We add 64 to whatever leading zeros are found in the lower 64 bits.
@@ -123,12 +127,14 @@ impl BitSet128 {
 
     /// Returns true if no bits are set.
     #[inline]
+    #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.0 == 0 && self.1 == 0
     }
     /// Returns the highest index set, or None if the bitset is empty.
     /// Useful for finding the "top" of a priority queue or resource map.
     #[inline]
+    #[must_use]
     pub const fn last_set(&self) -> Option<u8> {
         let leading = self.leading_zeros();
         if leading == 128 {
@@ -144,6 +150,7 @@ impl BitSet128 {
 
     /// Returns true if this bitset contains all the bits set in `other`.
     #[inline]
+    #[must_use]
     pub const fn is_superset(&self, other: &Self) -> bool {
         // A bitset is a superset if clearing any bits not present in self
         // results in exactly the other bitset configuration for both halves.
@@ -152,6 +159,7 @@ impl BitSet128 {
 
     /// Returns true if this bitset is a subset of `other`.
     #[inline]
+    #[must_use]
     pub const fn is_subset(&self, other: &BitSet128) -> bool {
         other.is_superset(self)
     }
@@ -159,6 +167,7 @@ impl BitSet128 {
     /// Returns true if this bitset shares at least one common set bit with `other`.
     /// Returns false if there is no overlap or if either bitset is empty.
     #[inline]
+    #[must_use]
     pub const fn intersects(&self, other: &Self) -> bool {
         // Run a bitwise AND between the bitsets.
         // If the result is non-zero, an intersection exists.
@@ -167,6 +176,7 @@ impl BitSet128 {
 
     /// Returns an iterator over the indices of the set bits.
     #[inline]
+    #[must_use]
     pub fn iter(&self) -> BitSet128Iter {
         self.into_iter()
     }
