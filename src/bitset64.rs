@@ -7,7 +7,7 @@ use {
 };
 
 /// A memory-efficient 64-bit set for embedded environments.
-/// Note that it data is a singlet: this makes comparison with `BitSet128` duplet clearer.
+// Note that it data is a singlet: this makes comparison with `BitSet128` duplet clearer.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct BitSet64(u64);
@@ -239,6 +239,7 @@ impl From<(u32, u32)> for BitSet64 {
 
 // **** Iter ****
 
+/// Iterator for `BitSet64`.
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct BitSet64Iter(u64);
 
@@ -346,17 +347,18 @@ mod tests {
     use super::*;
 
     fn is_normal<T: Sized + Send + Sync + Unpin>() {}
-    fn _is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
+    fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
     #[cfg(feature = "serde")]
     fn is_config<T: Serialize + for<'a> Deserialize<'a>>() {}
 
     #[test]
     fn normal_types() {
-        is_normal::<BitSet64>();
+        is_full::<BitSet64>();
         #[cfg(feature = "serde")]
         is_config::<BitSet64>();
         is_normal::<BitSet64Iter>();
     }
+
     #[test]
     fn new() {
         let mut bits = BitSet64::new();
@@ -364,12 +366,18 @@ mod tests {
         assert!(bits[42u8]);
         assert!(bits.test(42));
     }
-    #[allow(unused)]
+
     #[test]
     fn const_new() {
         const FLAGS: BitSet64 = BitSet64::new();
         const EMPTY_CHECK: bool = FLAGS.is_empty(); // Evaluated at compile time
+        assert_eq!(0, FLAGS.0);
+        #[allow(clippy::assertions_on_constants)]
+        {
+            assert!(EMPTY_CHECK);
+        }
     }
+
     #[test]
     fn assign() {
         let mut bits = BitSet64::new();
@@ -379,10 +387,12 @@ mod tests {
         let mask = bits;
         assert!(mask.test(42));
     }
+
     #[test]
     fn from() {
         let _bits = BitSet64::from((0xab_u32, 0x12_u32));
     }
+
     #[test]
     fn flip_all() {
         let mut bitset = BitSet64::new();
@@ -411,6 +421,7 @@ mod tests {
         empty_set.flip_all(); // Should return to completely empty
         assert!(empty_set.is_empty());
     }
+
     #[test]
     fn inplace_logical_ops() {
         let mut set_a = BitSet64::new();
@@ -451,6 +462,7 @@ mod tests {
         assert!(result.test(50)); // Preserved
         assert!(!result.test(60)); // Never present in set_a
     }
+
     #[test]
     fn exercise() {
         let mut system_flags = BitSet64::new();
@@ -491,6 +503,7 @@ mod tests {
         assert!(!diff.test(20));
         assert!(diff.test(30));
     }
+
     #[test]
     fn iterator_consuming() {
         let mut bits = BitSet64::new();
@@ -506,6 +519,7 @@ mod tests {
         assert_eq!(2, count);
         assert_eq!(12, sum);
     }
+
     #[test]
     fn into_iter_consuming() {
         let mut bits = BitSet64::new();

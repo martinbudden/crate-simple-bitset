@@ -271,6 +271,7 @@ impl From<(u32, u32, u32, u32)> for BitSet128 {
 
 // **** Iter ****
 
+/// Iterator for `BitSet128`.
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct BitSet128Iter(u64, u64);
 
@@ -404,6 +405,7 @@ mod tests {
         is_config::<BitSet128>();
         is_normal::<BitSet128Iter>();
     }
+
     #[test]
     fn new() {
         let mut bits = BitSet128::new();
@@ -411,12 +413,18 @@ mod tests {
         assert!(bits[42u8]);
         assert!(bits.test(42));
     }
-    #[allow(unused)]
+
     #[test]
     fn const_new() {
         const FLAGS: BitSet128 = BitSet128::new();
         const EMPTY_CHECK: bool = FLAGS.is_empty(); // Evaluated at compile time
+        assert_eq!(0, FLAGS.0);
+        #[allow(clippy::assertions_on_constants)]
+        {
+            assert!(EMPTY_CHECK);
+        }
     }
+
     #[test]
     fn assign() {
         let mut bits = BitSet128::new();
@@ -426,10 +434,12 @@ mod tests {
         let mask = bits;
         assert!(mask.test(42));
     }
+
     #[test]
     fn from() {
         let _bits = BitSet128::from((0xab_u32, 0x12_u32));
     }
+
     #[test]
     fn flip_all() {
         let mut bitset = BitSet128::new();
@@ -458,6 +468,7 @@ mod tests {
         empty_set.flip_all(); // Should return to completely empty
         assert!(empty_set.is_empty());
     }
+
     #[test]
     fn leading_zeros() {
         let mut bitset = BitSet128::new();
@@ -489,6 +500,7 @@ mod tests {
         bitset.set(0);
         assert_eq!(bitset.leading_zeros(), 127);
     }
+
     #[test]
     fn last_set() {
         let mut bitset = BitSet128::new();
@@ -519,6 +531,7 @@ mod tests {
         bitset.set(127);
         assert_eq!(bitset.last_set(), Some(127));
     }
+
     #[test]
     fn is_superset() {
         let mut set_a = BitSet128::new();
@@ -554,6 +567,7 @@ mod tests {
         // Your old function would mistakenly return true here.
         assert!(!set_c.is_superset(&set_d));
     }
+
     #[test]
     fn intersects() {
         let mut set_a = BitSet128::new();
@@ -582,6 +596,7 @@ mod tests {
         set_a.set(80);
         assert!(set_a.intersects(&set_b));
     }
+
     #[test]
     fn inplace_logical_ops() {
         let mut set_a = BitSet128::new();
@@ -622,6 +637,7 @@ mod tests {
         assert!(result.test(70)); // Preserved
         assert!(!result.test(80)); // Never present in set_a
     }
+
     #[test]
     fn exercise() {
         let mut system_flags = BitSet128::new();
@@ -791,6 +807,7 @@ mod tests {
         assert!(safe_bitset.test(20));
         assert_eq!(safe_bitset.count_ones(), 1); // Only index 20 should be set
     }
+
     #[test]
     fn empty_and_full() {
         let empty = BitSet128::new();
