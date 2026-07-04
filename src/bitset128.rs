@@ -151,7 +151,7 @@ impl BitSet128 {
     /// Returns true if this bitset contains all the bits set in `other`.
     #[inline]
     #[must_use]
-    pub const fn is_superset(&self, other: &Self) -> bool {
+    pub const fn is_superset(&self, other: Self) -> bool {
         // A bitset is a superset if clearing any bits not present in self
         // results in exactly the other bitset configuration for both halves.
         (self.0 & other.0) == other.0 && (self.1 & other.1) == other.1
@@ -160,15 +160,15 @@ impl BitSet128 {
     /// Returns true if this bitset is a subset of `other`.
     #[inline]
     #[must_use]
-    pub const fn is_subset(&self, other: &BitSet128) -> bool {
-        other.is_superset(self)
+    pub const fn is_subset(&self, other: BitSet128) -> bool {
+        other.is_superset(*self)
     }
 
     /// Returns true if this bitset shares at least one common set bit with `other`.
     /// Returns false if there is no overlap or if either bitset is empty.
     #[inline]
     #[must_use]
-    pub const fn intersects(&self, other: &Self) -> bool {
+    pub const fn intersects(&self, other: Self) -> bool {
         // Run a bitwise AND between the bitsets.
         // If the result is non-zero, an intersection exists.
         (self.0 & other.0) != 0 || (self.1 & other.1) != 0
@@ -186,43 +186,43 @@ impl BitSet128 {
 
 impl BitOr for BitSet128 {
     type Output = Self;
-    fn bitor(self, rhs: Self) -> Self::Output {
-        Self(self.0 | rhs.0, self.1 | rhs.1)
+    fn bitor(self, other: Self) -> Self::Output {
+        Self(self.0 | other.0, self.1 | other.1)
     }
 }
 
 impl BitAnd for BitSet128 {
     type Output = Self;
-    fn bitand(self, rhs: Self) -> Self::Output {
-        Self(self.0 & rhs.0, self.1 & rhs.1)
+    fn bitand(self, other: Self) -> Self::Output {
+        Self(self.0 & other.0, self.1 & other.1)
     }
 }
 
 impl BitXor for BitSet128 {
     type Output = Self;
-    fn bitxor(self, rhs: Self) -> Self::Output {
-        Self(self.0 ^ rhs.0, self.1 ^ rhs.1)
+    fn bitxor(self, other: Self) -> Self::Output {
+        Self(self.0 ^ other.0, self.1 ^ other.1)
     }
 }
 
 impl BitOrAssign for BitSet128 {
-    fn bitor_assign(&mut self, rhs: Self) {
-        self.0 |= rhs.0;
-        self.1 |= rhs.1;
+    fn bitor_assign(&mut self, other: Self) {
+        self.0 |= other.0;
+        self.1 |= other.1;
     }
 }
 
 impl BitAndAssign for BitSet128 {
-    fn bitand_assign(&mut self, rhs: Self) {
-        self.0 &= rhs.0;
-        self.1 &= rhs.1;
+    fn bitand_assign(&mut self, other: Self) {
+        self.0 &= other.0;
+        self.1 &= other.1;
     }
 }
 
 impl BitXorAssign for BitSet128 {
-    fn bitxor_assign(&mut self, rhs: Self) {
-        self.0 ^= rhs.0;
-        self.1 ^= rhs.1;
+    fn bitxor_assign(&mut self, other: Self) {
+        self.0 ^= other.0;
+        self.1 ^= other.1;
     }
 }
 
@@ -538,7 +538,7 @@ mod tests {
         let mut set_b = BitSet128::new();
 
         // An empty set is always a superset of another empty set
-        assert!(set_a.is_superset(&set_b));
+        assert!(set_a.is_superset(set_b));
 
         // Setup indices spanning across the 64-bit boundary
         set_a.set(10);
@@ -547,13 +547,13 @@ mod tests {
         set_b.set(10);
 
         // set_a has [10, 80], set_b has [10] -> Should be true
-        assert!(set_a.is_superset(&set_b));
+        assert!(set_a.is_superset(set_b));
         // set_b is missing 80 -> Should be false
-        assert!(!set_b.is_superset(&set_a));
+        assert!(!set_b.is_superset(set_a));
 
         // Test exact match
         set_b.set(80);
-        assert!(set_a.is_superset(&set_b));
+        assert!(set_a.is_superset(set_b));
 
         // Test failure where lower matches but higher fails (Catches the original bug)
         let mut set_c = BitSet128::new();
@@ -565,7 +565,7 @@ mod tests {
 
         // Lower halves match, but set_c is missing bit 95.
         // Your old function would mistakenly return true here.
-        assert!(!set_c.is_superset(&set_d));
+        assert!(!set_c.is_superset(set_d));
     }
 
     #[test]
@@ -574,27 +574,27 @@ mod tests {
         let mut set_b = BitSet128::new();
 
         // Empty sets should never intersect
-        assert!(!set_a.intersects(&set_b));
+        assert!(!set_a.intersects(set_b));
 
         // Add an item to set_a only
         set_a.set(15);
-        assert!(!set_a.intersects(&set_b));
+        assert!(!set_a.intersects(set_b));
 
         // Match the item in set_b (Intersection in the lower u64 block)
         set_b.set(15);
-        assert!(set_a.intersects(&set_b));
-        assert!(set_b.intersects(&set_a));
+        assert!(set_a.intersects(set_b));
+        assert!(set_b.intersects(set_a));
 
         // Test disjoint sets across the 64-bit split boundary
         set_a.reset_all();
         set_b.reset_all();
         set_a.set(10); // Lower u64 block
         set_b.set(80); // Higher u64 block
-        assert!(!set_a.intersects(&set_b));
+        assert!(!set_a.intersects(set_b));
 
         // Test intersection purely inside the higher u64 block (index >= 64)
         set_a.set(80);
-        assert!(set_a.intersects(&set_b));
+        assert!(set_a.intersects(set_b));
     }
 
     #[test]

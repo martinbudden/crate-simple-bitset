@@ -23,6 +23,12 @@ Once the API has stabilized this project will adopt semantic versioning, the fir
 
 ### Security
 
+## [0.1.4] - 2026-07-04
+
+### Changed
+
+- pass other by value in `is_superset`, `is_subset`, and `intersects` functions.
+
 ## [0.1.3] - 2026-07-04
 
 ### Added

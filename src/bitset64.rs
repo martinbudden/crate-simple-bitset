@@ -130,7 +130,7 @@ impl BitSet64 {
     /// Returns true if this bitset contains all the bits set in `other`.
     #[inline]
     #[must_use]
-    pub const fn is_superset(&self, other: &BitSet64) -> bool {
+    pub const fn is_superset(&self, other: BitSet64) -> bool {
         // A bitset is a superset if clearing any bits not present in self
         // results in exactly the other bitset configuration for both halves.
         (self.0 & other.0) == other.0
@@ -139,15 +139,15 @@ impl BitSet64 {
     /// Returns true if this bitset is a subset of `other`.
     #[inline]
     #[must_use]
-    pub const fn is_subset(&self, other: &BitSet64) -> bool {
-        other.is_superset(self)
+    pub const fn is_subset(&self, other: BitSet64) -> bool {
+        other.is_superset(*self)
     }
 
     /// Returns true if this bitset shares at least one common set bit with `other`.
     /// Returns false if there is no overlap or if either bitset is empty.
     #[inline]
     #[must_use]
-    pub const fn intersects(&self, other: &Self) -> bool {
+    pub const fn intersects(&self, other: Self) -> bool {
         // Run a bitwise AND between bitsets.
         // If the result is non-zero, an intersection exists.
         self.0 & other.0 != 0
@@ -165,40 +165,40 @@ impl BitSet64 {
 
 impl BitOr for BitSet64 {
     type Output = Self;
-    fn bitor(self, rhs: Self) -> Self::Output {
-        Self(self.0 | rhs.0)
+    fn bitor(self, other: Self) -> Self::Output {
+        Self(self.0 | other.0)
     }
 }
 
 impl BitAnd for BitSet64 {
     type Output = Self;
-    fn bitand(self, rhs: Self) -> Self::Output {
-        Self(self.0 & rhs.0)
+    fn bitand(self, other: Self) -> Self::Output {
+        Self(self.0 & other.0)
     }
 }
 
 impl BitXor for BitSet64 {
     type Output = Self;
-    fn bitxor(self, rhs: Self) -> Self::Output {
-        Self(self.0 ^ rhs.0)
+    fn bitxor(self, other: Self) -> Self::Output {
+        Self(self.0 ^ other.0)
     }
 }
 
 impl BitOrAssign for BitSet64 {
-    fn bitor_assign(&mut self, rhs: Self) {
-        self.0 |= rhs.0;
+    fn bitor_assign(&mut self, other: Self) {
+        self.0 |= other.0;
     }
 }
 
 impl BitAndAssign for BitSet64 {
-    fn bitand_assign(&mut self, rhs: Self) {
-        self.0 &= rhs.0;
+    fn bitand_assign(&mut self, other: Self) {
+        self.0 &= other.0;
     }
 }
 
 impl BitXorAssign for BitSet64 {
-    fn bitxor_assign(&mut self, rhs: Self) {
-        self.0 ^= rhs.0;
+    fn bitxor_assign(&mut self, other: Self) {
+        self.0 ^= other.0;
     }
 }
 
@@ -420,6 +420,110 @@ mod tests {
 
         empty_set.flip_all(); // Should return to completely empty
         assert!(empty_set.is_empty());
+    }
+
+    #[test]
+    fn leading_zeros() {
+        let mut bitset = BitSet64::new();
+
+        // Completely empty set should return 64 zeros
+        assert_eq!(bitset.leading_zeros(), 64);
+
+        // Setting the absolute most significant bit (index 63) leaves 0 leading zeros
+        bitset.set(63);
+        assert_eq!(bitset.leading_zeros(), 0);
+
+        // Setting index 62 leaves exactly 1 leading zero
+        bitset.reset_all();
+        bitset.set(62);
+        assert_eq!(bitset.leading_zeros(), 1);
+    }
+
+    #[test]
+    fn last_set() {
+        let mut bitset = BitSet64::new();
+
+        // Empty set should return None
+        assert_eq!(bitset.last_set(), None);
+
+        // Single lowest bit set
+        bitset.set(0);
+        assert_eq!(bitset.last_set(), Some(0));
+
+        // Multiple bits set, should return the highest one
+        bitset.set(10);
+        bitset.set(45);
+        assert_eq!(bitset.last_set(), Some(45));
+
+        // Boundary verification at the top of the lower u64
+        bitset.reset_all();
+        bitset.set(63);
+        assert_eq!(bitset.last_set(), Some(63));
+    }
+
+    #[test]
+    fn is_superset() {
+        let mut set_a = BitSet64::new();
+        let mut set_b = BitSet64::new();
+
+        // An empty set is always a superset of another empty set
+        assert!(set_a.is_superset(set_b));
+
+        // Setup indices spanning across the 64-bit boundary
+        set_a.set(10);
+        set_a.set(60);
+
+        set_b.set(10);
+
+        // set_a has [10, 60], set_b has [10] -> Should be true
+        assert!(set_a.is_superset(set_b));
+        // set_b is missing 80 -> Should be false
+        assert!(!set_b.is_superset(set_a));
+
+        // Test exact match
+        set_b.set(60);
+        assert!(set_a.is_superset(set_b));
+
+        // Test failure where lower matches but higher fails (Catches the original bug)
+        let mut set_c = BitSet64::new();
+        let mut set_d = BitSet64::new();
+        set_c.set(15); // Higher element (.1) is 0
+
+        set_d.set(15);
+        set_d.set(55); // Higher element (.1) is non-zero
+
+        // Lower halves match, but set_c is missing bit 95.
+        // Your old function would mistakenly return true here.
+        assert!(!set_c.is_superset(set_d));
+    }
+
+    #[test]
+    fn intersects() {
+        let mut set_a = BitSet64::new();
+        let mut set_b = BitSet64::new();
+
+        // Empty sets should never intersect
+        assert!(!set_a.intersects(set_b));
+
+        // Add an item to set_a only
+        set_a.set(15);
+        assert!(!set_a.intersects(set_b));
+
+        // Match the item in set_b (Intersection in the lower u64 block)
+        set_b.set(15);
+        assert!(set_a.intersects(set_b));
+        assert!(set_b.intersects(set_a));
+
+        // Test disjoint sets across the 64-bit split boundary
+        set_a.reset_all();
+        set_b.reset_all();
+        set_a.set(10);
+        set_b.set(60);
+        assert!(!set_a.intersects(set_b));
+
+        // Test intersection purely inside the higher u64 block (index >= 64)
+        set_a.set(60);
+        assert!(set_a.intersects(set_b));
     }
 
     #[test]
