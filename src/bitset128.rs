@@ -102,6 +102,50 @@ impl BitSet128 {
         }
     }
 
+    /// Returns bits 0 to 31.
+    #[allow(clippy::cast_possible_truncation)]
+    #[inline]
+    #[must_use]
+    pub fn bits_0_31(&self) -> u32 {
+        self.0 as u32
+    }
+
+    /// Returns bits 32 to 63.
+    #[inline]
+    #[must_use]
+    pub fn bits_32_63(&self) -> u32 {
+        (self.0 >> 32) as u32
+    }
+
+    /// Returns bits 64 to 95.
+    #[allow(clippy::cast_possible_truncation)]
+    #[inline]
+    #[must_use]
+    pub fn bits_64_95(&self) -> u32 {
+        self.1 as u32
+    }
+
+    /// Returns bits 96 to 127.
+    #[inline]
+    #[must_use]
+    pub fn bits_96_127(&self) -> u32 {
+        (self.1 >> 32) as u32
+    }
+
+    /// Returns bits 0 to 63.
+    #[inline]
+    #[must_use]
+    pub fn bits_0_63(&self) -> u64 {
+        self.0
+    }
+
+    /// Returns bits 64 to 127.
+    #[inline]
+    #[must_use]
+    pub fn bits_64_127(&self) -> u64 {
+        self.1
+    }
+
     /// Returns the number of set bits (population count).
     #[inline]
     #[must_use]
@@ -266,6 +310,22 @@ impl From<(u32, u32, u32, u32)> for BitSet128 {
     #[inline]
     fn from((a, b, c, d): (u32, u32, u32, u32)) -> Self {
         Self(u64::from(a) << 32 | u64::from(b), u64::from(c) << 32 | u64::from(d))
+    }
+}
+
+/// `BitSet128` from `u64`.
+impl From<u64> for BitSet128 {
+    #[inline]
+    fn from(a: u64) -> Self {
+        Self(a, 0)
+    }
+}
+
+/// `BitSet128` from `(u32, u32)`.
+impl From<(u64, u64)> for BitSet128 {
+    #[inline]
+    fn from((a, b): (u64, u64)) -> Self {
+        Self(a, b)
     }
 }
 

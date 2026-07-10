@@ -23,6 +23,13 @@ Once the API has stabilized this project will adopt semantic versioning, the fir
 
 ### Security
 
+## [0.1.5] - 2026-07-10
+
+### Added
+
+- `bits_0_31`, `bits_32_63` etc functions.
+- `From<u64>` functions.
+
 ## [0.1.4] - 2026-07-04
 
 ### Changed

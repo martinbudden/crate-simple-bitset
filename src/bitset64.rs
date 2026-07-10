@@ -91,6 +91,21 @@ impl BitSet64 {
         }
     }
 
+    /// Returns bits 0 to 31.
+    #[allow(clippy::cast_possible_truncation)]
+    #[inline]
+    #[must_use]
+    pub fn bits_0_31(&self) -> u32 {
+        self.0 as u32
+    }
+
+    /// Returns bits 32 to 63.
+    #[inline]
+    #[must_use]
+    pub fn bits_32_63(&self) -> u32 {
+        (self.0 >> 32) as u32
+    }
+
     /// Returns the number of set bits (population count).
     #[inline]
     #[must_use]
@@ -234,6 +249,14 @@ impl From<(u32, u32)> for BitSet64 {
     #[inline]
     fn from((a, b): (u32, u32)) -> Self {
         Self(u64::from(a) << 32 | u64::from(b))
+    }
+}
+
+/// `BitSet64` from `u64`.
+impl From<u64> for BitSet64 {
+    #[inline]
+    fn from(a: u64) -> Self {
+        Self(a)
     }
 }
 
