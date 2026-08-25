@@ -1,0 +1,4 @@
+[alias]
+
+# Run using: 'cargo test-serde'
+test-serde = "test --no-default-features --features serde --target x86_64-unknown-linux-gnu"

@@ -2,13 +2,14 @@ use core::fmt;
 use core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index};
 #[cfg(feature = "serde")]
 use {
+    postcard::experimental::max_size::MaxSize,
     sequential_storage::map::PostcardValue,
     serde::{Deserialize, Serialize},
 };
 
 /// A memory-efficient 128-bit set for embedded environments.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize, MaxSize))]
 pub struct BitSet128(u64, u64);
 
 impl BitSet128 {
@@ -450,13 +451,13 @@ impl fmt::UpperHex for BitSet128 {
 }
 
 #[cfg(test)]
-mod tests {
+mod test_traits {
     use super::*;
 
     fn is_normal<T: Sized + Send + Sync + Unpin>() {}
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
     #[cfg(feature = "serde")]
-    fn is_config<T: Serialize + for<'a> Deserialize<'a>>() {}
+    fn is_config<T: Serialize + MaxSize + for<'a> Deserialize<'a> + for<'a> PostcardValue<'a>>() {}
 
     #[test]
     fn normal_types() {
@@ -465,6 +466,11 @@ mod tests {
         is_config::<BitSet128>();
         is_normal::<BitSet128Iter>();
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn new() {
