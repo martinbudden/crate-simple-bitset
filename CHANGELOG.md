@@ -9,19 +9,11 @@ that is each release may contain incompatible API changes.
 
 Once the API has stabilized this project will adopt semantic versioning, the first release to do so will be `0.2.0`.
 
-## [Unreleased]
+## [0.1.6] - 2026-08-31
 
 ### Added
 
-### Changed
-
-### Removed
-
-### Deprecated
-
-### Fixed
-
-### Security
+- support for `postcard` `MaxSize`.
 
 ## [0.1.5] - 2026-07-10
 
@@ -34,7 +26,7 @@ Once the API has stabilized this project will adopt semantic versioning, the fir
 
 ### Changed
 
-- pass other by value in `is_superset`, `is_subset`, and `intersects` functions.
+- pass `other` by value in `is_superset`, `is_subset`, and `intersects` functions.
 
 ## [0.1.3] - 2026-07-04
 
@@ -50,7 +42,7 @@ Once the API has stabilized this project will adopt semantic versioning, the fir
 
 ### Added
 
-- #[must_use] attribute to selected functions.
+- `#[must_use]` attribute to selected functions.
 
 ### Removed
 
