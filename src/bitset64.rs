@@ -3,9 +3,10 @@ use core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, 
 #[cfg(feature = "serde")]
 use {
     postcard::experimental::max_size::MaxSize,
-    sequential_storage::map::PostcardValue,
     serde::{Deserialize, Serialize},
 };
+#[cfg(feature = "storage")]
+use sequential_storage::map::PostcardValue;
 
 /// A memory-efficient 64-bit set for embedded environments.
 // Note that it data is a singlet: this makes comparison with `BitSet128` duplet clearer.
@@ -21,7 +22,7 @@ impl BitSet64 {
     }
 }
 
-#[cfg(feature = "serde")]
+#[cfg(feature = "storage")]
 impl PostcardValue<'_> for BitSet64 {}
 
 impl Default for BitSet64 {
@@ -373,13 +374,17 @@ mod test_traits {
     fn is_normal<T: Sized + Send + Sync + Unpin>() {}
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
     #[cfg(feature = "serde")]
-    fn is_config<T: Serialize + MaxSize + for<'a> Deserialize<'a> + for<'a> PostcardValue<'a>>() {}
+    fn is_serde<T: Serialize + MaxSize + for<'a> Deserialize<'a>>() {}
+    #[cfg(feature = "storage")]
+    fn is_storage<T: for<'a> PostcardValue<'a>>() {}
 
     #[test]
     fn normal_types() {
         is_full::<BitSet64>();
         #[cfg(feature = "serde")]
-        is_config::<BitSet64>();
+        is_serde::<BitSet64>();
+        #[cfg(feature = "storage")]
+        is_storage::<BitSet64>();
         is_normal::<BitSet64Iter>();
     }
 }

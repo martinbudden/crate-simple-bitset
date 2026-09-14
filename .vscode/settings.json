@@ -12,6 +12,7 @@
         "inplace",
         "katex",
         "libm",
+        "msrv",
         "rustc",
         "rustdoc",
         "sbuf",
