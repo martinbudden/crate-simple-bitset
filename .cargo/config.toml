@@ -5,3 +5,8 @@ check-storage = "check --no-default-features --features storage --target x86_64-
 
 test-serde = "test --no-default-features --features serde --target x86_64-unknown-linux-gnu"
 test-storage = "test --no-default-features --features storage --target x86_64-unknown-linux-gnu"
+
+# Continuous Integration
+ci = "run --package xtask --bin xtask"
+# MSRV
+check-msrv = "run --package xtask --bin xtask -- check-msrv"

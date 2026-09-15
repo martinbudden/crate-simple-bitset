@@ -6,8 +6,10 @@
         "Budden",
         "bytemuck",
         "byteorder",
+        "clippy",
         "codegen",
         "debuginfo",
+        "dtolnay",
         "heapless",
         "inplace",
         "katex",
@@ -15,9 +17,12 @@
         "msrv",
         "rustc",
         "rustdoc",
+        "RUSTDOCFLAGS",
         "sbuf",
         "scopeguard",
         "serde",
-        "thiserror"
+        "swatinem",
+        "thiserror",
+        "xtask"
     ]
 }
