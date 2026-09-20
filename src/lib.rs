@@ -22,5 +22,5 @@
 mod bitset128;
 mod bitset64;
 
-pub use bitset64::{BitSet64, BitSet64Iter};
 pub use bitset128::{BitSet128, BitSet128Iter};
+pub use bitset64::{BitSet64, BitSet64Iter};

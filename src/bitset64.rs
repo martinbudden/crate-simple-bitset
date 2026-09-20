@@ -1,12 +1,13 @@
 use core::fmt;
 use core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index};
+
+#[cfg(feature = "storage")]
+use sequential_storage::map::PostcardValue;
 #[cfg(feature = "serde")]
 use {
     postcard::experimental::max_size::MaxSize,
     serde::{Deserialize, Serialize},
 };
-#[cfg(feature = "storage")]
-use sequential_storage::map::PostcardValue;
 
 /// A memory-efficient 64-bit set for embedded environments.
 // Note that it data is a singlet: this makes comparison with `BitSet128` duplet clearer.
@@ -224,7 +225,11 @@ impl Index<u8> for BitSet64 {
 
     fn index(&self, index: u8) -> &Self::Output {
         // We use static booleans because we must return a reference
-        if self.test(index) { &true } else { &false }
+        if self.test(index) {
+            &true
+        } else {
+            &false
+        }
     }
 }
 
@@ -234,7 +239,11 @@ impl Index<usize> for BitSet64 {
     #[allow(clippy::cast_possible_truncation)]
     fn index(&self, index: usize) -> &Self::Output {
         // We use static booleans because we must return a reference
-        if self.test(index as u8) { &true } else { &false }
+        if self.test(index as u8) {
+            &true
+        } else {
+            &false
+        }
     }
 }
 
