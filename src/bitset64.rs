@@ -94,6 +94,12 @@ impl BitSet64 {
         }
     }
 
+    /// Returns true if any of the bits in `mask` are set.
+    #[must_use]
+    pub const fn contains_any(self, mask: u64) -> bool {
+        self.0 & mask != 0
+    }
+
     /// Returns bits 0 to 31.
     #[allow(clippy::cast_possible_truncation)]
     #[inline]
@@ -463,6 +469,21 @@ mod tests {
 
         empty_set.flip_all(); // Should return to completely empty
         assert!(empty_set.is_empty());
+    }
+
+    #[test]
+    fn contains_any() {
+        let mut bitset = BitSet64::new();
+        assert!(!bitset.contains_any(0));
+        assert!(!bitset.contains_any(1));
+        assert!(!bitset.contains_any(1u64 << 5));
+
+        bitset.set(5);
+        assert!(!bitset.contains_any(1));
+        assert!(!bitset.contains_any(1u64 << 4));
+        assert!(!bitset.contains_any(1u64 << 32));
+        assert!(bitset.contains_any(1u64 << 5));
+        assert!(bitset.contains_any((1u64 << 5) | (1u64 << 32)));
     }
 
     #[test]

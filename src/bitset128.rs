@@ -104,6 +104,18 @@ impl BitSet128 {
         }
     }
 
+    /// Returns true if any of the bits in `mask` are set.
+    #[must_use]
+    pub const fn contains_any(self, mask: u64) -> bool {
+        self.0 & mask != 0
+    }
+
+    /// Returns true if any of the bits in `mask0` or `mask1` are set.
+    #[must_use]
+    pub const fn contains_any2(self, mask0: u64, mask1: u64) -> bool {
+        self.0 & mask0 != 0 || self.1 & mask1 != 0
+    }
+
     /// Returns bits 0 to 31.
     #[allow(clippy::cast_possible_truncation)]
     #[inline]
