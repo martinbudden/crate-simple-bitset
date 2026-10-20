@@ -9,11 +9,12 @@ that is each release may contain incompatible API changes.
 
 Once the API has stabilized this project will adopt semantic versioning, the first release to do so will be `0.2.0`.
 
-## [0.1.9] - 2026-10-xx
+## [0.1.9] - 2026-10-20
 
 ### Changed
 
 - Changed `.markdownlint.json` to allow more inline HTML.
+- Change MSRV to 1.77.
 
 ## [0.1.8] - 2026-10-04
 

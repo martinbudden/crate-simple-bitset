@@ -8,7 +8,7 @@ Simple `no-std` compatible 64-bit and 128-bit bitsets for embedded applications"
 `BitSet64` uses a `(u64)` singlet for its underlying storage.<br>
 `BitSet128` uses a `(u64, u64)` duplet for its underlying storage.
 
-This crate is `no_std`, `no alloc`, and the Minimum Supported Rust Version (MSRV) is `Rust 1.73`.
+This crate is `no_std`, `no alloc`, and the Minimum Supported Rust Version (MSRV) is `Rust 1.77`.
 
 ## License
 
